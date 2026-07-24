@@ -1,10 +1,9 @@
-#cd etl
-# python extract_cms_api.py
 """
 extract_cms_api.py
 
 Downloads CMS hospital quality datasets from the data.cms.gov API
-and saves them as raw CSV files for loading into the staging database.
+(CSV export endpoint) and saves them as raw CSV files for loading
+into the staging database.
 """
 
 import requests
@@ -12,9 +11,9 @@ import pandas as pd
 import os
 import logging
 from datetime import datetime
+from io import StringIO
 from config import DATASETS, OUTPUT_DIR
 
-# --- Set up logging so you can see what happened, and debug later ---
 logging.basicConfig(
     level=logging.INFO,
     format="%(asctime)s | %(levelname)s | %(message)s"
@@ -23,18 +22,16 @@ logger = logging.getLogger(__name__)
 
 
 def fetch_dataset(name: str, url: str) -> pd.DataFrame:
-    """Fetch a single dataset from the CMS API and return it as a DataFrame."""
+    """Fetch the full dataset as CSV from the CMS download endpoint."""
     logger.info(f"Requesting data for '{name}' from {url}")
 
-    response = requests.get(url, timeout=60)
-
-    # Raise an error if the request failed (bad URL, server error, etc.)
+    response = requests.get(url, timeout=120)
     response.raise_for_status()
 
-    data = response.json()
-    df = pd.DataFrame(data)
+    # Parse the CSV text directly into a DataFrame
+    df = pd.read_csv(StringIO(response.text), dtype=str)  # dtype=str preserves leading zeros in CCN
 
-    logger.info(f"Retrieved {len(df)} rows and {len(df.columns)} columns for '{name}'")
+    logger.info(f"Completed '{name}': {len(df)} rows, {len(df.columns)} columns")
     return df
 
 
@@ -53,7 +50,6 @@ def save_raw_csv(df: pd.DataFrame, name: str, output_dir: str) -> str:
 
 def main():
     logger.info("=== Starting CMS data extraction ===")
-
     results = {}
 
     for name, url in DATASETS.items():
@@ -65,7 +61,6 @@ def main():
             logger.error(f"Failed to fetch '{name}': {e}")
             results[name] = {"status": "failed", "error": str(e)}
 
-    # --- Summary report at the end ---
     logger.info("=== Extraction Summary ===")
     for name, result in results.items():
         logger.info(f"{name}: {result}")
