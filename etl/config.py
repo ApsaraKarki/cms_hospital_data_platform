@@ -1,13 +1,15 @@
 # config.py
-# API endpoints for each CMS dataset (get these from the "API" tab on each dataset page)
+import os
 
+# CSV download endpoints for each CMS dataset (data.cms.gov Provider Data Catalog API)
 DATASETS = {
-    "hospital_general_info": "https://data.cms.gov/data-api/v1/dataset/xubh-q36u/data",
-    "timely_effective_care": "https://data.cms.gov/data-api/v1/dataset/yv7e-xc69/data",
-    "hcahps_survey": "https://data.cms.gov/data-api/v1/dataset/dgck-syfz/data",
-    "readmissions": "https://data.cms.gov/data-api/v1/dataset/9n3s-kdb3/data",
+    "hospital_general_info": "https://data.cms.gov/provider-data/api/1/datastore/query/xubh-q36u/0/download?format=csv",
+    "timely_effective_care": "https://data.cms.gov/provider-data/api/1/datastore/query/yv7e-xc69/0/download?format=csv",
+    "hcahps_survey": "https://data.cms.gov/provider-data/api/1/datastore/query/dgck-syfz/0/download?format=csv",
+    "readmissions": "https://data.cms.gov/provider-data/api/1/datastore/query/9n3s-kdb3/0/download?format=csv",
 }
 
-OUTPUT_DIR = "../data/raw"  # where CSVs will be saved
-
-# replace these 4 URLs with the exact ones from each dataset's API tab on data.cms.gov (browser URL ≠ API endpoint, as we covered earlier)
+# Absolute path, built relative to THIS file's location (config.py),
+# not relative to wherever the script happens to be run from.
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+OUTPUT_DIR = os.path.join(BASE_DIR, "..", "data", "raw")

@@ -1,0 +1,25 @@
+-- Auto-generated from hcahps_survey_20260724.csv
+CREATE TABLE IF NOT EXISTS staging.stg_hcahps (
+    facility_id TEXT,
+    facility_name TEXT,
+    address TEXT,
+    citytown TEXT,
+    state TEXT,
+    zip_code TEXT,
+    countyparish TEXT,
+    telephone_number TEXT,
+    hcahps_measure_id TEXT,
+    hcahps_question TEXT,
+    hcahps_answer_description TEXT,
+    patient_survey_star_rating TEXT,
+    patient_survey_star_rating_footnote TEXT,
+    hcahps_answer_percent TEXT,
+    hcahps_answer_percent_footnote TEXT,
+    hcahps_linear_mean_value TEXT,
+    number_of_completed_surveys TEXT,
+    number_of_completed_surveys_footnote TEXT,
+    survey_response_rate_percent TEXT,
+    survey_response_rate_percent_footnote TEXT,
+    start_date TEXT,
+    end_date TEXT
+);
