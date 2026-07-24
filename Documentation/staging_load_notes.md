@@ -49,6 +49,7 @@ All row counts matched extraction output exactly. No errors, no rollbacks.
 ## 7. Verification (pgAdmin)
 ```sql
 SELECT * FROM staging.stg_hospital_general LIMIT 5;
+SELECT  COUNT(*) FROM staging.stg_*; 
 ```
 Confirmed `facility_id` retained leading zeros; column values aligned 
 correctly with CSV headers.
@@ -57,9 +58,3 @@ correctly with CSV headers.
 ## Next Step
 Migrate data from staging → target (cleaning, type casting, star schema load)
 via `database/target/migration/fn_migration_*.sql`.
-
----
-stg_hospital_general : 5,432 rows
-stg_timely_care       : 138,173 rows
-stg_hcahps             : 325,856 rows
-stg_readmissions       : 18,330 rows
