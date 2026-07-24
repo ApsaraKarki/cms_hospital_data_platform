@@ -1,0 +1,70 @@
+=========================================================
+CMS Hospital Data Platform - Python Virtual Environment Setup
+=========================================================
+
+Purpose: Set up an isolated Python environment for the ETL scripts
+in the /etl directory, so project dependencies don't conflict with
+other Python projects on this machine.
+
+---------------------------------------------------------
+Prerequisites (verified before setup)
+---------------------------------------------------------
+
+python --version
+# Confirms Python is installed and accessible from PowerShell
+
+pip --version
+# Confirms pip (Python's package installer) is available
+
+Get-ExecutionPolicy
+# Checks current PowerShell script execution policy
+
+Set-ExecutionPolicy RemoteSigned -Scope CurrentUser
+# Allows locally created scripts (like venv activation) to run,
+# while still blocking unsigned scripts downloaded from the internet
+
+git --version
+# Confirms Git is installed (needed for repo/version control)
+
+---------------------------------------------------------
+Step 1: Navigate to the ETL project folder
+---------------------------------------------------------
+
+cd C:\Users\apsar\Git\cms_hospital_data_platform\etl
+# Moves into the etl subdirectory where the virtual environment
+# and ETL scripts will live
+
+---------------------------------------------------------
+Step 2: Create the virtual environment
+---------------------------------------------------------
+
+python -m venv venv
+# Creates a new isolated Python environment in a folder named "venv"
+# (no output on success; a "venv" folder will appear)
+
+---------------------------------------------------------
+Step 3: Activate the virtual environment
+---------------------------------------------------------
+
+.\venv\Scripts\Activate.ps1
+# Activates the virtual environment for this terminal session
+# Prompt should change to show "(venv)" at the start when active
+
+---------------------------------------------------------
+Step 4: Install required libraries
+---------------------------------------------------------
+
+pip install requests pandas
+# requests -> used to call the CMS Open Data API
+# pandas   -> used to convert API responses into tables and save as CSV
+
+---------------------------------------------------------
+Notes
+---------------------------------------------------------
+
+- The "venv" folder should NOT be committed to Git.
+  Add it to .gitignore.
+- To deactivate the environment later, run: deactivate
+- To reactivate in a new terminal session, repeat Step 3.
+
+=========================================================

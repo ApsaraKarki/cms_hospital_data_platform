@@ -1,0 +1,29 @@
+# Python
+venv/
+__pycache__/
+*.pyc
+
+# Data files (raw CMS downloads - don't commit large data files)
+data/raw/
+data/*.csv
+
+# Environment/secrets
+.env
+
+# OS files
+.DS_Store
+Thumbs.db# Python
+venv/
+__pycache__/
+*.pyc
+
+# Data files (raw CMS downloads - don't commit large data files)
+data/raw/
+data/*.csv
+
+# Environment/secrets
+.env
+
+# OS files
+.DS_Store
+Thumbs.db
