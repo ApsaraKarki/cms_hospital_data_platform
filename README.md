@@ -77,7 +77,6 @@ CMS Provider Data Catalog (API)
 - **PowerShell** — idempotent local deployment of database structure
 - **Power BI** — dashboard and analytics layer
 
-## Repository Structure
 
 ## Repository Structure
 
