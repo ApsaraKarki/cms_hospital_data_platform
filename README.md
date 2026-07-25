@@ -43,29 +43,31 @@ joined on **CMS Certification Number (CCN)**:
 
 ## Architecture
 
+```
 CMS Provider Data Catalog (API)
-│
-▼ Python (extract_cms_api.py)
-Raw CSV files (data/raw/)
-│
-▼ Python + psycopg2 (load_staging.py)
-Staging Database — cms_hospital_quality_raw
-schema: staging
-• stg_hospital_general
-• stg_timely_care
-• stg_hcahps
-• stg_readmissions
-│
-▼ SQL migration functions (staging → target)
-Target Database / Warehouse — cms_hospital_quality
-schema: target
-• dim_hospital
-• fact_readmissions
-• fact_hcahps
-• fact_timely_care
-│
-▼
-Power BI Dashboard
+        │
+        ▼  Python (extract_cms_api.py)
+  Raw CSV files (data/raw/)
+        │
+        ▼  Python + psycopg2 (load_staging.py)
+  Staging Database — cms_hospital_quality_raw
+   schema: staging
+   - stg_hospital_general
+   - stg_timely_care
+   - stg_hcahps
+   - stg_readmissions
+        │
+        ▼  SQL migration functions (staging → target)
+  Target Database / Warehouse — cms_hospital_quality
+   schema: target
+   - dim_hospital
+   - fact_readmissions
+   - fact_hcahps
+   - fact_timely_care
+        │
+        ▼
+     Power BI Dashboard
+```
 
 ## Tech Stack
 
@@ -77,27 +79,31 @@ Power BI Dashboard
 
 ## Repository Structure
 
+## Repository Structure
+
+```
 cms_hospital_data_platform/
 ├── .gitignore
 ├── .env.example
 ├── README.md
 ├── etl/
-│ ├── extract_cms_api.py # Pulls data from CMS API, saves as CSV
-│ └── config.py # Dataset API endpoints, output paths
+│   ├── extract_cms_api.py       # Pulls data from CMS API, saves as CSV
+│   └── config.py                 # Dataset API endpoints, output paths
 ├── database/
-│ ├── staging/
-│ │ ├── ddl/ # Schema + table creation (staging)
-│ │ └── load/
-│ │ └── load_staging.py # Bulk-loads CSVs into staging tables
-│ ├── target/
-│ │ ├── ddl/ # Schema + table creation (star schema)
-│ │ └── migration/ # Cleaning/transformation SQL functions
-│ └── deploy/
-│ └── deploy_local.ps1 # One-time idempotent structure deployment
-├── powerbi/ # Power BI (.pbix) dashboard
-├── documentation/ # Setup notes and troubleshooting logs
+│   ├── staging/
+│   │   ├── ddl/                  # Schema + table creation (staging)
+│   │   └── load/
+│   │       └── load_staging.py   # Bulk-loads CSVs into staging tables
+│   ├── target/
+│   │   ├── ddl/                  # Schema + table creation (star schema)
+│   │   └── migration/            # Cleaning/transformation SQL functions
+│   └── deploy/
+│       └── deploy_local.ps1      # One-time idempotent structure deployment
+├── powerbi/                       # Power BI (.pbix) dashboard
+├── documentation/                 # Setup notes and troubleshooting logs
 └── data/
-└── raw/ # Extracted CSVs (gitignored)
+    └── raw/                       # Extracted CSVs (gitignored)
+```
 
 ## Getting Started
 
