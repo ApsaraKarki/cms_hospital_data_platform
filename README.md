@@ -13,21 +13,20 @@ production data platforms:
    Catalog API, covering four related hospital quality datasets.
 2. **Load (Stage)** — Raw CSVs are bulk-loaded as-is into a PostgreSQL 
    **staging** database, preserving the original structure for traceability 
-   and reprocessing.
+   and reprocessing. Staging is truncated and reloaded fresh on every run.
 3. **Transform** — SQL functions clean, standardize, and validate the staged 
-   data (handling data type mismatches, null values, duplicate records, and 
-   inconsistent formatting — e.g., preserving leading zeros in CMS 
-   Certification Numbers).
+   data (handling data type mismatches, null values, and inconsistent 
+   formatting — e.g., preserving leading zeros in CMS Certification Numbers).
 4. **Load (Target)** — Cleaned data is migrated into a **target/warehouse** 
    database, modeled as a star schema (fact and dimension tables) optimized 
    for analytical querying.
 5. **Visualize** — Power BI connects directly to the warehouse to build an 
    interactive hospital quality dashboard.
 
-Database structure (schemas, tables, indexes) is deployed once via a 
-PowerShell script and is idempotent — safe to re-run without affecting 
-existing data. The extraction → staging → migration pipeline is designed 
-to be re-run on demand to refresh data, independent of the underlying schema.
+Database structure (schemas, tables, indexes) is deployed separately from 
+the data pipeline. `deploy_local.ps1` is run manually, only during initial 
+setup or when the schema changes. `run_pipeline.ps1` handles the repeatable 
+extract → load cycle and does not modify schema.
 
 ## Data Sources
 
@@ -74,10 +73,8 @@ CMS Provider Data Catalog (API)
 - **Python** — data extraction (CMS API), staging load (bulk `COPY` via psycopg2)
 - **PostgreSQL** — staging and target/warehouse databases
 - **SQL** — schema DDL, data cleaning/transformation and migration functions
-- **PowerShell** — idempotent local deployment of database structure
+- **PowerShell** — idempotent local deployment of database structure, pipeline orchestration
 - **Power BI** — dashboard and analytics layer
-
-## Repository Structure
 
 ## Repository Structure
 
@@ -85,9 +82,13 @@ CMS Provider Data Catalog (API)
 cms_hospital_data_platform/
 ├── .gitignore
 ├── .env.example
+├── LICENSE
 ├── README.md
+├── requirements.txt
+├── run_pipeline.ps1              # Orchestrates: extract -> load staging
 ├── etl/
-│   ├── extract_cms_api.py       # Pulls data from CMS API, saves as CSV
+│   ├── venv/                     (gitignored)
+│   ├── extract_cms_api.py        # Pulls data from CMS API, saves as CSV
 │   └── config.py                 # Dataset API endpoints, output paths
 ├── database/
 │   ├── staging/
@@ -96,13 +97,13 @@ cms_hospital_data_platform/
 │   │       └── load_staging.py   # Bulk-loads CSVs into staging tables
 │   ├── target/
 │   │   ├── ddl/                  # Schema + table creation (star schema)
-│   │   └── migration/            # Cleaning/transformation SQL functions
+│   │   └── migration/            # Cleaning/transformation/migration SQL functions
 │   └── deploy/
 │       └── deploy_local.ps1      # One-time idempotent structure deployment
-├── powerbi/                       # Power BI (.pbix) dashboard
-├── documentation/                 # Setup notes and troubleshooting logs
+├── powerbi/                      # Power BI (.pbix) dashboard
+├── documentation/                # Setup notes and troubleshooting logs
 └── data/
-    └── raw/                       # Extracted CSVs (gitignored)
+    └── raw/                      # Extracted CSVs (gitignored)
 ```
 
 ## Getting Started
@@ -124,49 +125,71 @@ cd etl
 python -m venv venv
 .\venv\Scripts\Activate.ps1
 pip install -r requirements.txt
+cd ..
 ```
 
 ### 3. Configure environment variables
 Copy `.env.example` to `.env` in the project root and fill in your PostgreSQL credentials:
+```
 PGHOST=localhost
 PGPORT=5432
 PGDATABASE=cms_hospital_quality_raw
 PGUSER=postgres
 PGPASSWORD=your_password_here
+```
 
 ### 4. Deploy database structure
-Creates both databases, schemas, and all tables. Safe to re-run.
+Creates both databases, schemas, and all tables. Idempotent — safe to re-run. 
+Run once, or whenever the schema changes.
 ```powershell
 .\database\deploy\deploy_local.ps1
 ```
 
-### 5. Extract data from CMS
+### 5. Run the data pipeline
+Extracts the latest data from the CMS API and loads it into staging tables.
 ```powershell
-cd etl
-python extract_cms_api.py
+.\run_pipeline.ps1
 ```
 
-### 6. Load data into staging
-```powershell
-cd ..
-python database\staging\load\load_staging.py
-```
-
-### 7. Migrate staging → target *(in progress)*
+### 6. Migrate staging → target *(in progress)*
 ```powershell
 # Coming soon
 ```
 
-### 8. Open the Power BI dashboard
+### 7. Open the Power BI dashboard
 Open `powerbi/cms_hospital_quality.pbix`, connect to the `cms_hospital_quality` 
 database, and refresh.
 
+## Key Challenges & Solutions
+
+A few notable issues encountered and resolved during development (full logs 
+in `documentation/`):
+
+- **API pagination/response format** — initial JSON API endpoint returned 
+  only partial data per dataset. Resolved by switching to the CMS CSV 
+  export endpoint, which returns the complete dataset in one request.
+- **Leading zeros in CCN (Facility ID)** — CSV data read with explicit 
+  `dtype=str` to prevent pandas/Postgres from silently stripping leading 
+  zeros from hospital identifiers.
+- **Silent pipeline failure** — the staging loader originally caught errors 
+  per-table but always exited with a success code, causing the orchestration 
+  script to report success even when every table failed to load. Fixed by 
+  explicitly exiting with a non-zero code when any table fails.
+- **Windows Application Control blocking pandas** — a native pandas 
+  dependency was blocked by Windows Smart App Control; resolved by 
+  reinstalling with a forced prebuilt binary wheel.
+
 ## Roadmap
 
-- [x] CMS data extraction (Python + API, with pagination/CSV export handling)
+- [x] CMS data extraction (Python + API, with CSV export + leading-zero handling)
 - [x] Staging database setup and bulk load
 - [x] Idempotent local deployment script (PowerShell)
-- [ ] Staging → target migration (cleaning/transformation)
+- [x] Pipeline orchestration script (extract + load)
+- [ ] Staging → target migration (cleaning/transformation, upsert logic)
 - [ ] Power BI dashboard
 - [ ] Migrate repository to GitLab
-- [ ] CI/CD pipeline for automated deployment
+- [ ] CI/CD pipeline for automated deployment to VM
+
+## License
+
+This project is licensed under the MIT License — see the [LICENSE](./LICENSE) file for details.
