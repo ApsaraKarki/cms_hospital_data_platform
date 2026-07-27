@@ -79,30 +79,8 @@ Write-Host "`n=== Deployment complete ===" -ForegroundColor Cyan
 
 
 <#
-=========================================================
-DEPLOYMENT NOTES
-=========================================================
-
-Purpose:
-One-time (idempotent) setup script that creates both databases, schemas,
-and all staging/target tables via psql. Safe to re-run — uses
-IF NOT EXISTS everywhere, so re-running won't destroy existing data.
-
-Setup required before running:
-- psql must be available in PATH
-  (installed at C:\Program Files\PostgreSQL\18\bin)
-- Issue encountered: psql not recognized in new terminals even after
-  using [System.Environment]::SetEnvironmentVariable — resolved by a
-  full machine restart (environment variable cache issue)
-
 How to run:
     cd C:\Users\apsar\Git\cms_hospital_data_platform
     .\database\deploy\deploy_local.ps1
 
-Result of last successful run:
-Ran against already-existing databases/tables (created manually via
-pgAdmin). All statements returned "already exists, skipping" notices —
-confirms script is idempotent and safe to re-run without data loss.
-
-=========================================================
 #>
