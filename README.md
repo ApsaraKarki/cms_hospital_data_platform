@@ -56,7 +56,9 @@ CMS Provider Data Catalog (API)
    - stg_hcahps
    - stg_readmissions
         │
-        ▼  SQL migration functions (staging → target)
+        ▼  postgres_fdw (staging_link foreign tables)
+        │  SQL migration functions (staging → target, upsert)
+        ▼
   Target Database / Warehouse — cms_hospital_quality
    schema: target
    - dim_hospital
@@ -71,7 +73,8 @@ CMS Provider Data Catalog (API)
 ## Tech Stack
 
 - **Python** — data extraction (CMS API), staging load (bulk `COPY` via psycopg2)
-- **PostgreSQL** — staging and target/warehouse databases
+- **PostgreSQL** — staging and target/warehouse databases, connected 
+  via postgres_fdw for cross-database migration
 - **SQL** — schema DDL, data cleaning/transformation and migration functions
 - **PowerShell** — idempotent local deployment of database structure, pipeline orchestration
 - **Power BI** — dashboard and analytics layer
@@ -96,9 +99,11 @@ cms_hospital_data_platform/
 │   │       └── load_staging.py   # Bulk-loads CSVs into staging tables
 │   ├── target/
 │   │   ├── ddl/                  # Schema + table creation (star schema)
+│   │   ├── fdw/                  # postgres_fdw setup (staging -> target link)
+│   │   │   └── 00_setup_fdw.sql
 │   │   └── migration/            # Cleaning/transformation/migration SQL functions
 │   └── deploy/
-│       └── deploy_local.ps1      # One-time idempotent structure deployment
+│       └── deploy_local.ps1      # Idempotent structure deployment (DDL + FDW setup)
 ├── powerbi/                      # Power BI (.pbix) dashboard
 ├── documentation/                # Setup notes and troubleshooting logs
 └── data/
@@ -177,6 +182,12 @@ in `documentation/`):
 - **Windows Application Control blocking pandas** — a native pandas 
   dependency was blocked by Windows Smart App Control; resolved by 
   reinstalling with a forced prebuilt binary wheel.
+- **Cross-database querying** — staging and target live in separate 
+  PostgreSQL databases, which Postgres doesn't support querying across 
+  natively. Solved using `postgres_fdw`, exposing staging tables to the 
+  target database as foreign tables. Connection credentials are passed 
+  as parameterized `psql` variables, sourced from `.env` — never 
+  hardcoded in SQL.
 
 ## Roadmap
 
