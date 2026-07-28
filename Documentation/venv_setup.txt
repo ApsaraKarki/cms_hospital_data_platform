@@ -1,6 +1,5 @@
-=========================================================
 CMS Hospital Data Platform - Python Virtual Environment Setup
-=========================================================
+
 
 Purpose: Set up an isolated Python environment for the ETL scripts
 in the /etl directory, so project dependencies don't conflict with
@@ -66,5 +65,3 @@ Notes
   Add it to .gitignore.
 - To deactivate the environment later, run: deactivate
 - To reactivate in a new terminal session, repeat Step 3.
-
-=========================================================

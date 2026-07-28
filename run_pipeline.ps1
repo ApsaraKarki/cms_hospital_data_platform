@@ -41,9 +41,9 @@ catch {
 } 
 
 <#
-=========================================================
-HOW TO RUN
-=========================================================
+
+HOW TO RUN:
+
 
 Prerequisite (run once, or whenever database schema changes):
 
@@ -57,5 +57,5 @@ Then, to run the data pipeline (extract + load staging):
 
 Note: run_pipeline.ps1 does NOT create databases, schemas, or tables.
 It assumes deploy_local.ps1 has already been run successfully.
-=========================================================
+
 #>
