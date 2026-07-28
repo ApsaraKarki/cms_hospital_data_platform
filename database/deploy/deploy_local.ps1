@@ -1,13 +1,20 @@
 <#
 deploy_local.ps1
 
-One-time (idempotent) setup script: creates the two project databases,
-their schemas, and all staging/target tables.
+Idempotent local database structure deployment.
 
-Safe to re-run — uses IF NOT EXISTS everywhere, so re-running won't
-destroy existing structure or data. This script handles STRUCTURE only;
-it does not load or move data (see extract_cms_api.py, load_staging.py,
-and the migration scripts for the data pipeline).
+Creates:
+    1. Databases         (cms_hospital_quality_raw, cms_hospital_quality)
+    2. Schemas + tables   (staging DDL, target/star-schema DDL)
+    3. Cross-database link (postgres_fdw setup, staging -> target)
+
+Safe to re-run — uses IF NOT EXISTS (or equivalent DROP/CREATE patterns
+where IF NOT EXISTS isn't supported, e.g. CREATE SERVER) throughout, so
+re-running won't destroy existing structure or data.
+
+This script handles STRUCTURE only — it does not load or move data.
+See extract_cms_api.py, load_staging.py, and the fn_migration_* SQL
+functions for the actual data pipeline.
 #>
 
 # --- Load environment variables from .env ---
@@ -74,6 +81,19 @@ foreach ($script in $targetScripts) {
     Write-Host "  Running $($script.Name)..."
     psql -h $PGHOST -p $PGPORT -U $PGUSER -d cms_hospital_quality -f $script.FullName
 }
+
+# --- Step 4: Set up postgres_fdw (run against target database) ---
+Write-Host "`n=== Setting up postgres_fdw (staging -> target link) ===" -ForegroundColor Cyan
+
+$fdwScript = Join-Path $PSScriptRoot "..\target\fdw\00_setup_fdw.sql"
+
+psql -h $PGHOST -p $PGPORT -U $PGUSER -d cms_hospital_quality `
+    -v staging_host="$PGHOST" `
+    -v staging_port="$PGPORT" `
+    -v staging_dbname="cms_hospital_quality_raw" `
+    -v staging_user="$PGUSER" `
+    -v staging_password="$PGPASSWORD" `
+    -f $fdwScript
 
 Write-Host "`n=== Deployment complete ===" -ForegroundColor Cyan
 
