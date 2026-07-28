@@ -1,16 +1,16 @@
-# postgres_fdw Setup — Command Log
+# postgres_fdw Setup: Command Log
 
 ## Purpose
 Enables the target database (cms_hospital_quality) to query staging 
 tables in a separate database (cms_hospital_quality_raw) directly, 
-as if they were local tables — required since PostgreSQL does not 
+as if they were local tables, this is required since PostgreSQL does not 
 support native cross-database queries.
 
 ## Why postgres_fdw over dblink
 Chose postgres_fdw over the older dblink extension: FDW allows staging 
 tables to be queried with normal SELECT/JOIN syntax (via foreign tables), 
-rather than dblink's function-call style with embedded connection 
-strings. FDW is also the modern, currently-recommended approach.
+rather than dblink's function call style with embedded connection 
+strings. FDW is also the modern, currently recommended approach.
 
 ## Setup (in database/target/fdw/00_setup_fdw.sql)
 1. `CREATE EXTENSION postgres_fdw`
