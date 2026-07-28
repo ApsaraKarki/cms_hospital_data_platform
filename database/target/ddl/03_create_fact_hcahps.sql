@@ -3,7 +3,7 @@
 -- Grain: one row per hospital per HCAHPS question/measure
 
 CREATE TABLE IF NOT EXISTS target.fact_hcahps (
-    hcahps_id                          BIGSERIAL PRIMARY KEY,   -- surrogate key
+    hcahps_id                          BIGSERIAL PRIMARY KEY,
     facility_id                         VARCHAR(10) NOT NULL REFERENCES target.dim_hospital(facility_id),
     hcahps_measure_id                    VARCHAR(50),
     hcahps_question                     VARCHAR(255),
@@ -19,7 +19,8 @@ CREATE TABLE IF NOT EXISTS target.fact_hcahps (
     survey_response_rate_percent_footnote  VARCHAR(500),
     start_date                          DATE,
     end_date                            DATE,
-    loaded_at                           TIMESTAMP DEFAULT NOW()
+    loaded_at                           TIMESTAMP DEFAULT NOW(),
+    CONSTRAINT uq_fact_hcahps_facility_measure UNIQUE (facility_id, hcahps_measure_id)
 );
 
 CREATE INDEX IF NOT EXISTS idx_fact_hcahps_facility ON target.fact_hcahps(facility_id);
