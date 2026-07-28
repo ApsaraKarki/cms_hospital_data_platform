@@ -1,14 +1,14 @@
-# Local Deployment Script — deploy_local.ps1
+# Local Deployment Script: deploy_local.ps1
 
 ## Purpose
 One-time (idempotent) setup script that creates both databases, schemas, 
-and all staging/target tables via psql. Safe to re-run — uses 
+and all staging/target tables via psql. Safe to re-run. 
 IF NOT EXISTS everywhere.
 
 ## Setup required
 - psql added to PATH (installed at C:\Program Files\PostgreSQL\18\bin)
   - Issue: psql not recognized in new terminals even after 
-    SetEnvironmentVariable — resolved by full machine restart 
+    SetEnvironmentVariable resolved by full machine restart 
     (environment variable cache issue)
 
 ## Run
@@ -20,4 +20,4 @@ cd C:\Users\apsar\Git\cms_hospital_data_platform
 ## Result
 Ran successfully against existing databases/tables (created manually 
 earlier via pgAdmin). All statements returned "already exists, skipping" 
-notices — confirms script is idempotent and safe to re-run without data loss.
+notices confirms script is idempotent and safe to re-run without data loss.
