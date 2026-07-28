@@ -3,7 +3,7 @@
 -- Grain: one row per hospital per measure
 
 CREATE TABLE IF NOT EXISTS target.fact_readmissions (
-    readmission_id             BIGSERIAL PRIMARY KEY,        -- surrogate key
+    readmission_id             BIGSERIAL PRIMARY KEY,
     facility_id                 VARCHAR(10) NOT NULL REFERENCES target.dim_hospital(facility_id),
     measure_name                VARCHAR(255),
     number_of_discharges         INTEGER,
@@ -14,7 +14,8 @@ CREATE TABLE IF NOT EXISTS target.fact_readmissions (
     number_of_readmissions       INTEGER,
     start_date                  DATE,
     end_date                    DATE,
-    loaded_at                   TIMESTAMP DEFAULT NOW()
+    loaded_at                   TIMESTAMP DEFAULT NOW(),
+    CONSTRAINT uq_fact_readmissions_facility_measure UNIQUE (facility_id, measure_name)
 );
 
 CREATE INDEX IF NOT EXISTS idx_fact_readmissions_facility ON target.fact_readmissions(facility_id);
