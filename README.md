@@ -188,6 +188,19 @@ in `documentation/`):
   target database as foreign tables. Connection credentials are passed 
   as parameterized `psql` variables, sourced from `.env` — never 
   hardcoded in SQL.
+## Data Quality & Cleaning
+
+Before building migration logic, staging data was sampled to identify 
+inconsistent values (e.g., `"Not Available"` mixed into numeric fields, 
+text-based Yes/No flags). Rather than repeating cleaning logic across 
+each migration function, reusable SQL helper functions were built for 
+safe type casting (`safe_to_numeric`, `safe_to_integer`, `safe_to_date`, 
+`safe_to_boolean`) and text cleanup (`clean_text`) — each designed to 
+degrade gracefully to `NULL` on unexpected values rather than fail the 
+entire load.
+
+See [`documentation/data_quality_notes.md`](./documentation/data_quality_notes.md) 
+for the full investigation and findings.
 
 ## Roadmap
 

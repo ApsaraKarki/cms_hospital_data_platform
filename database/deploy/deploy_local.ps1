@@ -95,6 +95,19 @@ psql -h $PGHOST -p $PGPORT -U $PGUSER -d cms_hospital_quality `
     -v staging_password="$PGPASSWORD" `
     -f $fdwScript
 
+# --- Step 5: Deploy helper functions + migration functions (target database) ---
+Write-Host "`n=== Deploying migration functions ===" -ForegroundColor Cyan
+
+$migrationPath = Join-Path $PSScriptRoot "..\target\migration"
+$migrationScripts = Get-ChildItem -Path $migrationPath -Filter "*.sql" | Sort-Object Name
+
+foreach ($script in $migrationScripts) {
+    Write-Host "  Running $($script.Name)..."
+    psql -h $PGHOST -p $PGPORT -U $PGUSER -d cms_hospital_quality -f $script.FullName
+}
+
+Write-Host "`n=== Deployment complete ===" -ForegroundColor Cyan
+
 Write-Host "`n=== Deployment complete ===" -ForegroundColor Cyan
 
 
