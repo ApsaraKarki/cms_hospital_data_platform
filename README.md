@@ -208,7 +208,7 @@ for the full investigation and findings.
 - [x] Staging database setup and bulk load
 - [x] Idempotent local deployment script (PowerShell)
 - [x] Pipeline orchestration script (extract + load)
-- [ ] Staging → target migration (cleaning/transformation, upsert logic)
+- [x] Staging → target migration (cleaning/transformation, upsert logic)
 - [ ] Power BI dashboard
 - [ ] Migrate repository to GitLab
 - [ ] CI/CD pipeline for automated deployment to VM
