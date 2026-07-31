@@ -9,18 +9,18 @@ culminating in an interactive Power BI dashboard.
 This project follows a staging-to-warehouse ETL pattern commonly used in 
 production data platforms:
 
-1. **Extract** — A Python script pulls raw data from the CMS Provider Data 
+1. **Extract**  A Python script pulls raw data from the CMS Provider Data 
    Catalog API, covering four related hospital quality datasets.
-2. **Load (Stage)** — Raw CSVs are bulk-loaded as-is into a PostgreSQL 
+2. **Load (Stage)**  Raw CSVs are bulk-loaded as-is into a PostgreSQL 
    **staging** database, preserving the original structure for traceability 
    and reprocessing. Staging is truncated and reloaded fresh on every run.
-3. **Transform** — SQL functions clean, standardize, and validate the staged 
+3. **Transform**  SQL functions clean, standardize, and validate the staged 
    data (handling data type mismatches, null values, and inconsistent 
-   formatting — e.g., preserving leading zeros in CMS Certification Numbers).
-4. **Load (Target)** — Cleaned data is migrated into a **target/warehouse** 
+   formatting  e.g., preserving leading zeros in CMS Certification Numbers).
+4. **Load (Target)**  Cleaned data is migrated into a **target/warehouse** 
    database, modeled as a star schema (fact and dimension tables) optimized 
    for analytical querying.
-5. **Visualize** — Power BI connects directly to the warehouse to build an 
+5. **Visualize**  Power BI connects directly to the warehouse to build an 
    interactive hospital quality dashboard.
 
 Database structure (schemas, tables, indexes) is deployed separately from 
@@ -72,12 +72,12 @@ CMS Provider Data Catalog (API)
 
 ## Tech Stack
 
-- **Python** — data extraction (CMS API), staging load (bulk `COPY` via psycopg2)
-- **PostgreSQL** — staging and target/warehouse databases, connected 
+- **Python**  data extraction (CMS API), staging load (bulk `COPY` via psycopg2)
+- **PostgreSQL**  staging and target/warehouse databases, connected 
   via postgres_fdw for cross-database migration
-- **SQL** — schema DDL, data cleaning/transformation and migration functions
-- **PowerShell** — idempotent local deployment of database structure, pipeline orchestration
-- **Power BI** — dashboard and analytics layer
+- **SQL**  schema DDL, data cleaning/transformation and migration functions
+- **PowerShell**  idempotent local deployment of database structure, pipeline orchestration
+- **Power BI**  dashboard and analytics layer
 
 
 ```
@@ -143,7 +143,7 @@ PGPASSWORD=your_password_here
 ```
 
 ### 4. Deploy database structure
-Creates both databases, schemas, and all tables. Idempotent — safe to re-run. 
+Creates both databases, schemas, and all tables. Idempotent  safe to re-run. 
 Run once, or whenever the schema changes.
 ```powershell
 .\database\deploy\deploy_local.ps1
@@ -169,24 +169,24 @@ database, and refresh.
 A few notable issues encountered and resolved during development (full logs 
 in `documentation/`):
 
-- **API pagination/response format** — initial JSON API endpoint returned 
+- **API pagination/response format**  initial JSON API endpoint returned 
   only partial data per dataset. Resolved by switching to the CMS CSV 
   export endpoint, which returns the complete dataset in one request.
-- **Leading zeros in CCN (Facility ID)** — CSV data read with explicit 
+- **Leading zeros in CCN (Facility ID)**  CSV data read with explicit 
   `dtype=str` to prevent pandas/Postgres from silently stripping leading 
   zeros from hospital identifiers.
-- **Silent pipeline failure** — the staging loader originally caught errors 
+- **Silent pipeline failure**  the staging loader originally caught errors 
   per-table but always exited with a success code, causing the orchestration 
   script to report success even when every table failed to load. Fixed by 
   explicitly exiting with a non-zero code when any table fails.
-- **Windows Application Control blocking pandas** — a native pandas 
+- **Windows Application Control blocking pandas**  a native pandas 
   dependency was blocked by Windows Smart App Control; resolved by 
   reinstalling with a forced prebuilt binary wheel.
-- **Cross-database querying** — staging and target live in separate 
+- **Cross-database querying**  staging and target live in separate 
   PostgreSQL databases, which Postgres doesn't support querying across 
   natively. Solved using `postgres_fdw`, exposing staging tables to the 
   target database as foreign tables. Connection credentials are passed 
-  as parameterized `psql` variables, sourced from `.env` — never 
+  as parameterized `psql` variables, sourced from `.env`  never 
   hardcoded in SQL.
 ## Data Quality & Cleaning
 
@@ -195,7 +195,7 @@ inconsistent values (e.g., `"Not Available"` mixed into numeric fields,
 text-based Yes/No flags). Rather than repeating cleaning logic across 
 each migration function, reusable SQL helper functions were built for 
 safe type casting (`safe_to_numeric`, `safe_to_integer`, `safe_to_date`, 
-`safe_to_boolean`) and text cleanup (`clean_text`) — each designed to 
+`safe_to_boolean`) and text cleanup (`clean_text`)  each designed to 
 degrade gracefully to `NULL` on unexpected values rather than fail the 
 entire load.
 
@@ -215,4 +215,4 @@ for the full investigation and findings.
 
 ## License
 
-This project is licensed under the MIT License — see the [LICENSE](./LICENSE) file for details.
+This project is licensed under the MIT License. See the [LICENSE](./LICENSE) file for details.
