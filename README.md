@@ -143,26 +143,25 @@ PGPASSWORD=your_password_here
 ```
 
 ### 4. Deploy database structure
-Creates both databases, schemas, and all tables. Idempotent  safe to re-run. 
-Run once, or whenever the schema changes.
+Creates both databases, schemas, tables, the postgres_fdw cross-database link, 
+and migration function definitions. Idempotent — safe to re-run. Run once, 
+or whenever the structure changes.
 ```powershell
 .\database\deploy\deploy_local.ps1
 ```
 
 ### 5. Run the data pipeline
-Extracts the latest data from the CMS API and loads it into staging tables.
+Extracts the latest data from the CMS API, loads it into staging tables, and 
+migrates it into the target warehouse (cleaning, type casting, upsert).
 ```powershell
 .\run_pipeline.ps1
 ```
 
-### 6. Migrate staging → target *(in progress)*
-```powershell
-# Coming soon
-```
-
-### 7. Open the Power BI dashboard
+### 6. Open the Power BI dashboard
 Open `powerbi/cms_hospital_quality.pbix`, connect to the `cms_hospital_quality` 
 database, and refresh.
+```Coming soon
+```
 
 ## Key Challenges & Solutions
 
